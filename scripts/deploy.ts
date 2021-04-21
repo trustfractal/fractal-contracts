@@ -1,9 +1,12 @@
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import dayjs from "dayjs";
 
 const { parseEther } = ethers.utils;
 
-const FractalIssuerAddress = "TODO";
+const FractalIssuerAddress =
+  network.name == "mainnet"
+    ? process.env.MAINNET_FRACTAL_ISSUER
+    : process.env.ROPSTEN_FRACTAL_ISSUER;
 
 /// May first
 const startDate = dayjs(new Date(2021, 4, 1));

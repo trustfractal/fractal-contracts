@@ -11,3 +11,9 @@ contract FractalToken is ERC20 {
     _mint(targetOwner, 465000000000000000000000000);
   }
 }
+
+contract LPToken is ERC20 {
+  constructor(address targetOwner) ERC20("FCL-ETH-LP Token", "FCL-ETH-LP") {
+    _mint(targetOwner, 465000000000000000000000000);
+  }
+}

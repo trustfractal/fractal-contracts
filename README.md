@@ -1,10 +1,17 @@
 # Fractal Staking/DID contracts
 
+## Secrets
+
+A `.envrc` is available on keybase `fractalwallet` team. Request access to it,
+and use it with [direnv](https://direnv.net/).
+
+## Contracts
+
 Two main contracts are included:
 * Staking
 * ClaimsRegistry
 
-## ClaimsRegistry
+### ClaimsRegistry
 
 In conjunction with the browser plugin, this contract can be used to submit and
 verify claims.
@@ -27,7 +34,7 @@ The expected flow is as follows:
 * Further calls to `registry.getClaim(issuer, signature)` should return `subject`;
 
 
-## Staking
+### Staking
 
 A staking contract receives the following arguments:
 * `_token`: Address of the ERC20 token to stake
