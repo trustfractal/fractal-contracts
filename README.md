@@ -1,5 +1,21 @@
 # Fractal Staking/DID contracts
 
+## Development (with ganache)
+
+### Secrets
+
+A `.envrc` is available on keybase `fractalwallet` team. Request access to it,
+and use it with [direnv](https://direnv.net/).
+
+### Deploying to a local test node
+
+1. Install [ganache](https://www.trufflesuite.com/ganache) on your system
+2. Start `ganache` and create a workspace.
+3. Ensure the mnemonic on `Settings > Accounts & Keys` matches the one on the
+   `GANACHE_MNEMONIC` given on `.envrc`
+4. `yarn run deploy:ganache`
+5. Use the output addresses in whatever way you need
+
 ## Deployed addresses
 
 ### Ropsten
@@ -21,11 +37,6 @@
 | ClaimRegistry      | TODO                                       | TODO |
 | FCL Staking        | TODO                                       | TODO |
 | FTL-ETH LP Staking | TODO                                       | TODO |
-
-## Secrets
-
-A `.envrc` is available on keybase `fractalwallet` team. Request access to it,
-and use it with [direnv](https://direnv.net/).
 
 ## Contracts
 

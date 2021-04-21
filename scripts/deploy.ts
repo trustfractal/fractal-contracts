@@ -4,6 +4,10 @@ import dayjs from "dayjs";
 const { parseEther } = ethers.utils;
 const { env, exit } = process;
 
+interface Contract {
+  address: string;
+}
+
 const config: Record<string, any> = {
   ropsten: {
     fcl: env.ROPSTEN_FCL,
@@ -12,6 +16,18 @@ const config: Record<string, any> = {
     start: dayjs("23/04/2021", "DD/MM/YYYY").unix(),
     end: dayjs("24/04/2021", "DD/MM/YYYY")
       .add(5, "days")
+      .unix(),
+    minStake: parseEther("1"),
+    maxStake: parseEther("10000"),
+    capPercent: 40,
+  },
+  ganache: {
+    issuer: env.GANACHE_FRACTAL_ISSUER,
+    start: dayjs()
+      .add(5, "minutes")
+      .unix(),
+    end: dayjs()
+      .add(1, "days")
       .unix(),
     minStake: parseEther("1"),
     maxStake: parseEther("10000"),
@@ -31,21 +47,47 @@ const config: Record<string, any> = {
   },
 };
 
-async function main() {
-  const ClaimsRegistry = await ethers.getContractFactory("ClaimsRegistry");
-  const Staking = await ethers.getContractFactory("Staking");
+async function deployTestTokens() {
+  if (network.name === "mainnet") {
+    throw "This script is not meant to be executed on mainnet";
+  }
 
-  const args = config[network.name];
+  const FCL = await ethers.getContractFactory("FractalToken");
+  const LP = await ethers.getContractFactory("LPToken");
+
+  const signers = await ethers.getSigners();
+  const owner = signers[0];
+
+  const fcl = await FCL.deploy(owner.address);
+  const lp = await LP.deploy(owner.address);
+
+  await fcl.deployed();
+  await lp.deployed();
+
+  console.log("Test FCL token deployed to:", fcl.address);
+  console.log("Test FCL-ETH-LP token deployed to:", lp.address);
+
+  return { fcl, lp };
+}
+
+async function deployRegistry(): Promise<any> {
+  const ClaimsRegistry = await ethers.getContractFactory("ClaimsRegistry");
 
   console.log(`Deploying ClaimsRegistry`);
   const registry = await ClaimsRegistry.deploy();
   await registry.deployed();
   console.log("Registry deployed to:", registry.address);
 
+  return registry;
+}
+
+async function deployStaking(registry: Contract, args: Record<string, string>) {
+  const Staking = await ethers.getContractFactory("Staking");
+
   console.log(`Deploying FCL Staking`);
   const fclStaking = await Staking.deploy(
     args.fcl,
-    args.registry,
+    registry.address,
     args.issuer,
     args.start,
     args.end,
@@ -55,9 +97,9 @@ async function main() {
   );
 
   console.log(`Deploying FCL-ETH LP Staking`);
-  const uniStaking = await Staking.deploy(
+  const lpStaking = await Staking.deploy(
     args.lp,
-    args.registry,
+    registry.address,
     args.issuer,
     args.start,
     args.end,
@@ -68,12 +110,34 @@ async function main() {
 
   console.log(`Both deployed. waiting for confirmation...`);
   await fclStaking.deployed();
-  await uniStaking.deployed();
+  await lpStaking.deployed();
   console.log(`Done!`);
 
-  console.log("ClaimsRegistry deployed to:", registry.address);
-  console.log("FCL Staking deployed to:", fclStaking.address);
-  console.log("FCL/ETH LP Staking deployed to:", uniStaking.address);
+  return { fclStaking, lpStaking };
+}
+
+async function main() {
+  const args = config[network.name];
+  let tokens: any;
+
+  if (network.name === "ganache") {
+    tokens = await deployTestTokens();
+    args.fcl = tokens.fcl.address;
+    args.lp = tokens.lp.address;
+  }
+
+  const registry = await deployRegistry();
+  const { fclStaking, lpStaking } = await deployStaking(registry, args);
+
+  console.log(`
+| Contract           | Address                                    |
+| ------------------ | ------------------------------------------ |
+| FCL Token          | ${args.fcl} |
+| FCL-ETH LP Token   | ${args.lp} |
+| ClaimRegistry      | ${registry.address} |
+| FCL Staking        | ${fclStaking.address} |
+| FTL-ETH LP Staking | ${lpStaking.address} |
+`);
 }
 
 main()

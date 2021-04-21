@@ -6,7 +6,12 @@ import "hardhat-docgen";
 
 import { HardhatUserConfig } from "hardhat/config";
 
-const { ALCHEMY_API_KEY, ROPSTEN_MNEMONIC, MAINNET_MNEMONIC } = process.env;
+const {
+  ALCHEMY_API_KEY,
+  ROPSTEN_MNEMONIC,
+  MAINNET_MNEMONIC,
+  GANACHE_MNEMONIC,
+} = process.env;
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -30,6 +35,12 @@ const config: HardhatUserConfig = {
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
       accounts: {
         mnemonic: ROPSTEN_MNEMONIC,
+      },
+    },
+    ganache: {
+      url: "http://127.0.0.1:7545",
+      accounts: {
+        mnemonic: GANACHE_MNEMONIC,
       },
     },
     mainnet: {

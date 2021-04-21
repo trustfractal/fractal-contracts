@@ -4,10 +4,12 @@
   "version": "0.0.1",
   "scripts": {
     "lint:sol": "solhint contracts/**.sol",
-    "test": "TS_NODE_TRANSPILE_ONLY=1 hardhat test"
+    "test": "TS_NODE_TRANSPILE_ONLY=1 hardhat test",
+    "deploy:ganache": "hardhat run scripts/deploy.ts --network ganache"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-ganache": "^2.0.0",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@typechain/hardhat": "^1.0.1",
     "@types/chai": "^4.2.15",
