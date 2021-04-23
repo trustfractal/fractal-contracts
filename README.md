@@ -20,23 +20,23 @@ and use it with [direnv](https://direnv.net/).
 
 ### Ropsten
 
-| Contract           | Address                                    | Etherscan                                                                             |
-| ------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------- |
-| FCL Token          | 0xf0Ec4dCD7D375023f2B8E9db19aC5DB95b06a06A | [link](https://ropsten.etherscan.io/token/0xf0ec4dcd7d375023f2b8e9db19ac5db95b06a06a) |
-| FCL-ETH LP Token   | 0x93c45B9a9151e8c4C88e9a4990853Fa2b500C07c | [link](https://ropsten.etherscan.io/token/0x93c45b9a9151e8c4c88e9a4990853fa2b500c07c) |
-| ClaimRegistry      | TODO                                       | TODO |
-| FCL Staking        | TODO                                       | TODO |
-| FTL-ETH LP Staking | TODO                                       | TODO |
+| Contract           | Address                                    |
+| ------------------ | ------------------------------------------ |
+| FCL Token          | 0xf0Ec4dCD7D375023f2B8E9db19aC5DB95b06a06A |
+| FCL-ETH LP Token   | 0x93c45B9a9151e8c4C88e9a4990853Fa2b500C07c |
+| ClaimRegistry      | 0x181573a13F4BF5F76F6d09D0E2a7716F6929993A |
+| FCL Staking        | 0x6b21231526C87EB88A8ECea9f351895AA85dcB84 |
+| FTL-ETH LP Staking | 0x596644D95282Ce22fE92772DfbBaa60Ecd0018e9 |
 
 ### Mainnet
 
-| Contract           | Address                                    | Etherscan                                                                       |
-| ------------------ | ------------------------------------------ | --------------------------------------------------------------------------------|
-| FCL Token          | 0xf4d861575ecc9493420a3f5a14f85b13f0b50eb3 | [link](https://ropsten.etherscan.io/token/0xf0ec4dcd7d375023f2b8e9db19ac5db95b06a06a) |
-| FCL-ETH LP Token   | 0xdec87f2f3e7a936b08ebd7b2371ab12cc8b68340 | [link](https://ropsten.etherscan.io/token/0x93c45b9a9151e8c4c88e9a4990853fa2b500c07c) |
-| ClaimRegistry      | TODO                                       | TODO |
-| FCL Staking        | TODO                                       | TODO |
-| FTL-ETH LP Staking | TODO                                       | TODO |
+| Contract           | Address                                    |
+| ------------------ | ------------------------------------------ |
+| FCL Token          | 0xf4d861575ecc9493420a3f5a14f85b13f0b50eb3 |
+| FCL-ETH LP Token   | 0xdec87f2f3e7a936b08ebd7b2371ab12cc8b68340 |
+| ClaimRegistry      | TODO                                       |
+| FCL Staking        | TODO                                       |
+| FTL-ETH LP Staking | TODO                                       |
 
 ## Contracts
 

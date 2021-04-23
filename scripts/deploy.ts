@@ -13,8 +13,8 @@ const config: Record<string, any> = {
     fcl: env.ROPSTEN_FCL,
     lp: env.ROPSTEN_FCL_ETH_LP,
     issuer: env.ROPSTEN_FRACTAL_ISSUER,
-    start: dayjs("25/04/2021", "DD/MM/YYYY").unix(),
-    end: dayjs("25/04/2021", "DD/MM/YYYY")
+    start: dayjs("2021-04-25T12:00:00.000Z").unix(),
+    end: dayjs("2021-04-25T12:00:00.000Z")
       .add(60, "days")
       .unix(),
     minStake: parseEther("1"),
@@ -37,8 +37,8 @@ const config: Record<string, any> = {
     fcl: env.MAINNET_FCL,
     lp: env.MAINNET_FCL_ETH_LP,
     issuer: process.env.MAINNET_FRACTAL_ISSUER,
-    start: dayjs("TODO", "DD/MM/YYYY").unix(),
-    end: dayjs("TODO", "DD/MM/YYYY")
+    start: dayjs("TODO").unix(),
+    end: dayjs("TODO")
       .add(60, "days")
       .unix(),
     minStake: parseEther("1"),
