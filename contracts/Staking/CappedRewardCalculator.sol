@@ -21,8 +21,13 @@ contract CappedRewardCalculator {
   uint public cap;
 
   uint constant private year = 365 days;
+  uint constant private day = 1 days;
   uint private constant mul = 1000000;
 
+  /// @notice constructor
+  /// @param _start The start timestamp for staking
+  /// @param _start The end timestamp for staking
+  /// @param _cap The cap percentage of the reward (40 == maximum of 40% of your initial stake)
   constructor(
     uint _start,
     uint _end,
@@ -41,6 +46,11 @@ contract CappedRewardCalculator {
     cap = _cap;
   }
 
+  /// @notice Given a timestamp range and an amount, calculates the expected nominal return
+  /// @param _start The start timestamp to consider
+  /// @param _end The end timestamp to consider
+  /// @param _amount The amount to stake
+  /// @return The nominal amount of the reward
   function calculateReward(
     uint _start,
     uint _end,
@@ -54,6 +64,25 @@ contract CappedRewardCalculator {
     uint reward = _amount * cap * percentage / (mul * 100);
 
     return reward;
+  }
+
+  /// @notice Estimates the current offered APY
+  /// @return The estimated APY (40 == 40%)
+  function currentAPY() public view returns (uint) {
+    uint amount = 100 ether;
+    uint current = block.timestamp + day;
+    uint currentReward = calculateReward(startDate, current, amount);
+
+    uint previous = current - day;
+    uint previousReward = 0;
+    if (previous > startDate) {
+      previousReward = calculateReward(startDate, previous, amount);
+    }
+
+    uint delta = currentReward - previousReward;
+    uint apy = delta * 365 * 100 / amount;
+
+    return apy;
   }
 
   function toPeriodPercents(
@@ -94,6 +123,7 @@ contract CappedRewardCalculator {
 
     return ratio;
   }
+
 
   function integralAtPoint(uint _x) internal pure returns (int) {
     int x = int(_x);

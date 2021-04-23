@@ -25,9 +25,9 @@ describe("CappedRewardCalculator", () => {
     .unix(deployDate)
     .add(1, "day")
     .unix();
-  let oneYearLater = dayjs
+  let twoMonthsLater = dayjs
     .unix(start)
-    .add(365, "day")
+    .add(60, "day")
     .unix();
 
   const ensureTimestamp = (timestamp: number): Promise<unknown> => {
@@ -49,9 +49,9 @@ describe("CappedRewardCalculator", () => {
       .unix(deployDate)
       .add(1, "day")
       .unix();
-    oneYearLater = dayjs
+    twoMonthsLater = dayjs
       .unix(start)
-      .add(365, "day")
+      .add(60, "day")
       .unix();
 
     ensureTimestamp(deployDate);
@@ -61,12 +61,12 @@ describe("CappedRewardCalculator", () => {
     it("creates a contract when given valid arguments", async () => {
       const calc = (await deploy(owner, CappedRewardCalculatorArtifact, [
         start,
-        oneYearLater,
+        twoMonthsLater,
         100,
       ])) as CappedRewardCalculator;
 
       expect(await calc.startDate()).to.eq(start);
-      expect(await calc.endDate()).to.eq(oneYearLater);
+      expect(await calc.endDate()).to.eq(twoMonthsLater);
       expect(await calc.cap()).to.eq(100);
     });
 
@@ -74,7 +74,7 @@ describe("CappedRewardCalculator", () => {
       const yesterday = dayjs()
         .subtract(1, "day")
         .unix();
-      const args = [yesterday, oneYearLater, 100];
+      const args = [yesterday, twoMonthsLater, 100];
 
       const action = deploy(owner, CappedRewardCalculatorArtifact, args);
 
@@ -84,7 +84,7 @@ describe("CappedRewardCalculator", () => {
     });
 
     it("fails if endDate is before startDate", async () => {
-      const args = [oneYearLater, start, 100];
+      const args = [twoMonthsLater, start, 100];
 
       const action = deploy(owner, CappedRewardCalculatorArtifact, args);
 
@@ -94,7 +94,7 @@ describe("CappedRewardCalculator", () => {
     });
 
     it("fails if curveCap is zero", async () => {
-      const args = [start, oneYearLater, 0];
+      const args = [start, twoMonthsLater, 0];
 
       const action = deploy(owner, CappedRewardCalculatorArtifact, args);
 
@@ -106,7 +106,7 @@ describe("CappedRewardCalculator", () => {
 
   describe("private functions", () => {
     beforeEach(async () => {
-      const args = [start, oneYearLater, 100];
+      const args = [start, twoMonthsLater, 100];
 
       tester = (await deploy(
         owner,
@@ -126,17 +126,17 @@ describe("CappedRewardCalculator", () => {
       it("truncates given endDate", async () => {
         const [r1, r2] = await tester.testTruncatePeriod(
           start + 1,
-          oneYearLater + 1
+          twoMonthsLater + 1
         );
 
         expect(r1).to.eq(start + 1);
-        expect(r2).to.eq(oneYearLater);
+        expect(r2).to.eq(twoMonthsLater);
       });
 
       it("gives a 0-length period if outside of bounds", async () => {
         const [r1, r2] = await tester.testTruncatePeriod(
-          oneYearLater,
-          oneYearLater + 10
+          twoMonthsLater,
+          twoMonthsLater + 10
         );
 
         expect(r1).to.eq(r2);
@@ -145,7 +145,10 @@ describe("CappedRewardCalculator", () => {
 
     describe("toPeriodPercents", () => {
       it("calculates 0% to 100%", async () => {
-        const [r1, r2] = await tester.testToPeriodPercents(start, oneYearLater);
+        const [r1, r2] = await tester.testToPeriodPercents(
+          start,
+          twoMonthsLater
+        );
 
         expect(r1).to.eq(0);
         expect(r2).to.eq(1000000);
@@ -154,7 +157,7 @@ describe("CappedRewardCalculator", () => {
       it("calculates 0% to 50%", async () => {
         const [r1, r2] = await tester.testToPeriodPercents(
           start,
-          (start + oneYearLater) / 2
+          (start + twoMonthsLater) / 2
         );
 
         expect(r1).to.eq(0);
@@ -163,8 +166,8 @@ describe("CappedRewardCalculator", () => {
 
       it("calculates 50% to 100%", async () => {
         const [r1, r2] = await tester.testToPeriodPercents(
-          (start + oneYearLater) / 2,
-          oneYearLater
+          (start + twoMonthsLater) / 2,
+          twoMonthsLater
         );
 
         expect(r1).to.eq(500000);
@@ -173,8 +176,8 @@ describe("CappedRewardCalculator", () => {
 
       it("calculates 10% to 90%", async () => {
         const [r1, r2] = await tester.testToPeriodPercents(
-          start + (oneYearLater - start) * 0.1,
-          start + (oneYearLater - start) * 0.9
+          start + (twoMonthsLater - start) * 0.1,
+          start + (twoMonthsLater - start) * 0.9
         );
 
         expect(r1).to.eq(100000);
@@ -234,7 +237,7 @@ describe("CappedRewardCalculator", () => {
 
   describe("public functions", () => {
     beforeEach(async () => {
-      const args = [start, oneYearLater, 100];
+      const args = [start, twoMonthsLater, 40];
 
       calc = (await deploy(
         owner,
@@ -246,20 +249,20 @@ describe("CappedRewardCalculator", () => {
     describe("calculate reward", () => {
       describe("for curve period", () => {
         it("works for 100 units throught the entire curve period", async () => {
-          const reward = await calc.calculateReward(start, oneYearLater, 100);
+          const reward = await calc.calculateReward(start, twoMonthsLater, 100);
 
-          expect(reward).to.eq(100);
+          expect(reward).to.eq(40);
         });
 
         it("is proportional to how many tokens I stake", async () => {
           const reward100 = await calc.calculateReward(
             start,
-            oneYearLater,
+            twoMonthsLater,
             100
           );
           const reward1000 = await calc.calculateReward(
             start,
-            oneYearLater,
+            twoMonthsLater,
             1000
           );
 
@@ -278,7 +281,7 @@ describe("CappedRewardCalculator", () => {
           for (let i = 0.1; i <= 0.8; i += 0.1) {
             const reward = await calc.calculateReward(
               start,
-              start + (oneYearLater - start) * i,
+              start + (twoMonthsLater - start) * i,
               1000
             );
 
@@ -292,8 +295,8 @@ describe("CappedRewardCalculator", () => {
 
           for (let i = 0.1; i <= 0.8; i += 0.1) {
             const reward = await calc.calculateReward(
-              start + (oneYearLater - start) * (i - 0.1),
-              start + (oneYearLater - start) * i,
+              start + (twoMonthsLater - start) * (i - 0.1),
+              start + (twoMonthsLater - start) * i,
               1000
             );
 
@@ -303,10 +306,50 @@ describe("CappedRewardCalculator", () => {
         });
       });
     });
+
+    describe("currentAPY", () => {
+      it("is around 700% at the beginning", async () => {
+        ensureTimestamp(start);
+        network.provider.send("evm_mine", []);
+        const apy0 = await calc.currentAPY();
+
+        ensureTimestamp(
+          dayjs
+            .unix(start)
+            .add(1, "days")
+            .unix()
+        );
+        network.provider.send("evm_mine", []);
+        const apy1 = await calc.currentAPY();
+
+        ensureTimestamp(
+          dayjs
+            .unix(start)
+            .add(10, "days")
+            .unix()
+        );
+        network.provider.send("evm_mine", []);
+        const apy10 = await calc.currentAPY();
+
+        ensureTimestamp(
+          dayjs
+            .unix(start)
+            .add(60, "days")
+            .unix()
+        );
+        network.provider.send("evm_mine", []);
+        const apy60 = await calc.currentAPY();
+
+        expect(apy0).to.eq(717);
+        expect(apy1).to.eq(693);
+        expect(apy10).to.eq(496);
+        expect(apy60).to.eq(0);
+      });
+    });
   });
 
   // describe("calculations", () => {
-  //   let twoWeeksLater = dayjs.unix(start).add(15, "days").unix();
+  //   let twoMonthsLater = dayjs.unix(start).add(15, "days").unix();
   //   let threeMonthsLater = dayjs
   //     .unix(start)
   //     .add(30 * 3, "months")
@@ -314,7 +357,7 @@ describe("CappedRewardCalculator", () => {
   //   let amount = parseEther("1000");
 
   //   before(async () => {
-  //     const args = [start, twoWeeksLater, threeMonthsLater, 100, 15];
+  //     const args = [start, twoMonthsLater, threeMonthsLater, 100, 15];
 
   //     calc = (await deploy(
   //       owner,
