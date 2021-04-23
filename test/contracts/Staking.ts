@@ -68,7 +68,9 @@ describe("Staking", () => {
       expect(await staking.minAmount()).to.eq(2);
       expect(await staking.maxAmount()).to.eq(parseEther("10000"));
       expect(await staking.cap()).to.eq(100);
-      expect(await staking.lockedTokens()).to.eq(0);
+      expect(await staking.lockedReward()).to.eq(0);
+      expect(await staking.distributedReward()).to.eq(0);
+      expect(await staking.stakedAmount()).to.eq(0);
     });
 
     it("fails if token address is 0x0", async () => {
@@ -371,6 +373,46 @@ describe("Staking", () => {
         await expect(action).to.emit(staking, "Subscribed");
       });
 
+      it("updates lockedReward", async () => {
+        await staking.connect(owner).stake(parseEther("1"), "0x00");
+        await staking.connect(alice).stake(parseEther("1.5"), "0x00");
+
+        const expectedOwnerReward = await staking.getMaxStakeReward(
+          owner.address
+        );
+        const expectedAliceReward = await staking.getMaxStakeReward(
+          alice.address
+        );
+
+        expect(await staking.lockedReward()).to.eq(
+          expectedOwnerReward.add(expectedAliceReward)
+        );
+      });
+
+      it("updates stakedAmount", async () => {
+        await staking.connect(owner).stake(parseEther("1"), "0x00");
+        await staking.connect(alice).stake(parseEther("1.5"), "0x00");
+
+        expect(await staking.stakedAmount()).to.eq(parseEther("2.5"));
+      });
+
+      it("does not update totalPool", async () => {
+        const totalPoolBefore = await staking.totalPool();
+        await staking.stake(parseEther("1"), "0x00");
+        const totalPoolAfter = await staking.totalPool();
+
+        expect(totalPoolBefore).to.eq(parseEther("1000"));
+        expect(totalPoolAfter).to.eq(totalPoolBefore);
+      });
+
+      it("updates available pool", async () => {
+        const totalPoolBefore = await staking.availablePool();
+        await staking.stake(parseEther("1"), "0x00");
+        const totalPoolAfter = await staking.availablePool();
+
+        expect(totalPoolAfter).to.be.lt(totalPoolBefore);
+      });
+
       it("fails if amount is lower than minAmount", async () => {
         const action = staking.stake(parseEther("0.5"), "0x00");
 
@@ -491,6 +533,40 @@ describe("Staking", () => {
         await expect(action).to.emit(staking, "Withdrawn");
       });
 
+      it("does not update totalPool", async () => {
+        await staking.stake(parseEther("1"), "0x00");
+        ensureTimestamp(oneMonthLater);
+
+        const totalPoolBefore = await staking.totalPool();
+        await staking.withdraw();
+        const totalPoolAfter = await staking.totalPool();
+
+        expect(totalPoolBefore).to.eq(parseEther("1000"));
+        expect(totalPoolAfter).to.eq(totalPoolBefore);
+      });
+
+      it("does not update available pool if maximum reward is achieved", async () => {
+        await staking.stake(parseEther("1"), "0x00");
+        ensureTimestamp(oneMonthLater * 2);
+
+        const totalPoolBefore = await staking.availablePool();
+        await staking.withdraw();
+        const totalPoolAfter = await staking.availablePool();
+
+        expect(totalPoolAfter).to.eq(totalPoolBefore);
+      });
+
+      it("updates available pool if less than maximum reward is achieved", async () => {
+        await staking.stake(parseEther("1"), "0x00");
+        ensureTimestamp(oneDayLater);
+
+        const totalPoolBefore = await staking.availablePool();
+        await staking.withdraw();
+        const totalPoolAfter = await staking.availablePool();
+
+        expect(totalPoolAfter).to.be.gt(totalPoolBefore);
+      });
+
       it("does not work for already-withdrawn subscriptions", async () => {
         await staking.stake(parseEther("1000"), "0x00");
         await staking.withdraw();
@@ -533,10 +609,10 @@ describe("Staking", () => {
       });
 
       it("depletes the available pool", async () => {
-        const poolBefore = await staking.availablePoolBalance();
+        const poolBefore = await staking.availablePool();
         ensureTimestamp(oneMonthLater + 1);
         await staking.withdrawPool();
-        const poolAfter = await staking.availablePoolBalance();
+        const poolAfter = await staking.availablePool();
 
         expect(poolBefore).to.be.gt(poolAfter);
         expect(poolAfter).to.eq(0);
@@ -550,12 +626,12 @@ describe("Staking", () => {
         await staking.withdrawPool();
         const balanceAfter = await fcl.balanceOf(staking.address);
 
-        const locked = await staking.lockedTokens();
         const aliceStake = await staking.getStakedAmount(alice.address);
         const aliceReward = await staking.getMaxStakeReward(alice.address);
 
+        expect(await staking.availablePool()).to.eq(0);
+        expect(await staking.totalPool()).to.be.gt(0);
         expect(balanceBefore).to.be.gt(balanceAfter);
-        expect(balanceAfter).to.eq(locked);
         expect(balanceAfter).to.eq(aliceStake.add(aliceReward));
       });
 

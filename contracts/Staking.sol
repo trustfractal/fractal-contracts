@@ -28,8 +28,14 @@ contract Staking is CappedRewardCalculator, Ownable {
   /// @notice The maximum staking amount per account
   uint public maxAmount;
 
-  /// @notice How many tokens are currently locked (already reserverd for a user)
-  uint public lockedTokens = 0;
+  /// @notice Locked rewards pending withdrawal
+  uint public lockedReward = 0;
+
+  /// @notice Rewards already distributed
+  uint public distributedReward = 0;
+
+  /// @notice How much is currently staked
+  uint public stakedAmount = 0;
 
   /// @notice Subscription details for each account
   mapping(address => Subscription) public subscriptions;
@@ -94,9 +100,16 @@ contract Staking is CappedRewardCalculator, Ownable {
     maxAmount = _maxAmount;
   }
 
-  /// @notice return
-  function availablePoolBalance() public view returns (uint) {
-    return erc20.balanceOf(address(this)) - lockedTokens;
+  /// @notice Get the total size of the reward pool
+  /// @return Returns the total size of the reward pool, including locked and distributed tokens
+  function totalPool() public view returns (uint) {
+    return erc20.balanceOf(address(this)) - stakedAmount + distributedReward;
+  }
+
+  /// @notice Get the available size of the reward pool
+  /// @return Returns the available size of the reward pool, no including locked or distributed rewards
+  function availablePool() public view returns (uint) {
+    return erc20.balanceOf(address(this)) - stakedAmount - lockedReward;
   }
 
   /// @notice Requests a new stake to be created. Only one stake per account is
@@ -118,8 +131,9 @@ contract Staking is CappedRewardCalculator, Ownable {
 
 
     uint maxReward = calculateReward(time, endDate, _amount);
-    require(maxReward <= availablePoolBalance(), "Staking: not enough tokens available in the pool");
-    lockedTokens += _amount + maxReward;
+    require(maxReward <= availablePool(), "Staking: not enough tokens available in the pool");
+    lockedReward += maxReward;
+    stakedAmount += _amount;
 
     // transfer tokens from subscriber to the contract
     require(erc20.transferFrom(subscriber, address(this), _amount),
@@ -147,21 +161,23 @@ contract Staking is CappedRewardCalculator, Ownable {
 
     Subscription memory sub = subscriptions[subscriber];
 
-    uint reward = calculateReward(sub.startDate, time, sub.stakedAmount);
-    uint total = sub.stakedAmount + reward;
+    uint actualReward = calculateReward(sub.startDate, time, sub.stakedAmount);
+    uint total = sub.stakedAmount + actualReward;
 
 
     // transfer tokens back to subscriber
     require(erc20.transfer(subscriber, total), "Staking: Transfer has failed");
 
     // update subscription state
-    sub.withdrawAmount = sub.stakedAmount + reward;
+    sub.withdrawAmount = total;
     sub.withdrawDate = time;
     sub.active = false;
     subscriptions[subscriber] = sub;
 
     // update locked amount
-    lockedTokens = lockedTokens - (sub.stakedAmount + sub.maxReward);
+    lockedReward -= sub.maxReward;
+    distributedReward += actualReward;
+    stakedAmount -= sub.stakedAmount;
 
     emit Withdrawn(subscriber, time, total);
   }
@@ -207,6 +223,6 @@ contract Staking is CappedRewardCalculator, Ownable {
   function withdrawPool() external onlyOwner {
     require(block.timestamp > endDate, "Staking: staking not over yet");
 
-    erc20.transfer(owner(), availablePoolBalance());
+    erc20.transfer(owner(), availablePool());
   }
 }
