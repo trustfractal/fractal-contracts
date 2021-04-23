@@ -13,9 +13,9 @@ const config: Record<string, any> = {
     fcl: env.ROPSTEN_FCL,
     lp: env.ROPSTEN_FCL_ETH_LP,
     issuer: env.ROPSTEN_FRACTAL_ISSUER,
-    start: dayjs("23/04/2021", "DD/MM/YYYY").unix(),
-    end: dayjs("24/04/2021", "DD/MM/YYYY")
-      .add(5, "days")
+    start: dayjs("25/04/2021", "DD/MM/YYYY").unix(),
+    end: dayjs("25/04/2021", "DD/MM/YYYY")
+      .add(60, "days")
       .unix(),
     minStake: parseEther("1"),
     maxStake: parseEther("10000"),
