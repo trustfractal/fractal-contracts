@@ -21,6 +21,7 @@
     "ethers": "^5.1.0",
     "hardhat": "^2.1.2",
     "hardhat-docgen": "^1.1.0",
+    "hardhat-gas-reporter": "^1.0.4",
     "solhint": "^3.3.4",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.3",
