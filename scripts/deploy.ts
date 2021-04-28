@@ -12,7 +12,7 @@ const config: Record<string, any> = {
   ropsten: {
     fcl: env.ROPSTEN_FCL,
     lp: env.ROPSTEN_FCL_ETH_LP,
-    issuer: env.ROPSTEN_FRACTAL_ISSUER,
+    attester: env.ROPSTEN_FRACTAL_ATTESTER,
     start: dayjs("2021-04-25T12:00:00.000Z").unix(),
     end: dayjs("2021-04-25T12:00:00.000Z")
       .add(60, "days")
@@ -22,7 +22,7 @@ const config: Record<string, any> = {
     capPercent: 40,
   },
   ganache: {
-    issuer: env.GANACHE_FRACTAL_ISSUER,
+    attester: env.GANACHE_FRACTAL_ATTESTER,
     start: dayjs()
       .add(5, "minutes")
       .unix(),
@@ -36,7 +36,7 @@ const config: Record<string, any> = {
   mainnet: {
     fcl: env.MAINNET_FCL,
     lp: env.MAINNET_FCL_ETH_LP,
-    issuer: process.env.MAINNET_FRACTAL_ISSUER,
+    attester: process.env.MAINNET_FRACTAL_ATTESTER,
     start: dayjs("TODO").unix(),
     end: dayjs("TODO")
       .add(60, "days")
@@ -88,7 +88,7 @@ async function deployStaking(registry: Contract, args: Record<string, string>) {
   const fclStaking = await Staking.deploy(
     args.fcl,
     registry.address,
-    args.issuer,
+    args.attester,
     args.start,
     args.end,
     args.minStake,
@@ -100,7 +100,7 @@ async function deployStaking(registry: Contract, args: Record<string, string>) {
   const lpStaking = await Staking.deploy(
     args.lp,
     registry.address,
-    args.issuer,
+    args.attester,
     args.start,
     args.end,
     args.minStake,

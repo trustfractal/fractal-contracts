@@ -9,12 +9,12 @@ import "./ClaimsRegistry/Verifier.sol";
 /// @title The claim verification interface expected by the Staking contract
 /// @author Miguel Palhas <miguel@subvisual.co>
 interface IClaimsRegistryVerifier {
-  /// @notice Verifies that the given `sig` corresponds to a claim about `subject`, signed by `issuer`
+  /// @notice Verifies that the given `sig` corresponds to a claim about `subject`, signed by `attester`
   /// @param subject The subject the claim refers to
-  /// @param issuer The account that is expected to have signed the claim
+  /// @param attester The account that is expected to have signed the claim
   /// @param sig The signature
-  /// @return Whether a claim about `subject` and signed by `issuer` does exist and matches `sig`
-  function verifyClaim(address subject, address issuer, bytes calldata sig) external view returns (bool);
+  /// @return Whether a claim about `subject` and signed by `attester` does exist and matches `sig`
+  function verifyClaim(address subject, address attester, bytes calldata sig) external view returns (bool);
 }
 
 /// @title A claim registry. Does not actually store data, but only signatures of claims and their subjects
@@ -34,29 +34,29 @@ contract ClaimsRegistry is IClaimsRegistryVerifier, Verifier {
     bytes sig
   );
 
-  /// @notice Emitted when a previously stored claim is successfuly revoked by the issuer
+  /// @notice Emitted when a previously stored claim is successfuly revoked by the attester
   event ClaimRevoked(
     bytes sig
   );
 
-  /// @notice Stores a claim about `subject`, signed by `issuer`. Instead of
+  /// @notice Stores a claim about `subject`, signed by `attester`. Instead of
   ///   actual data, receives only `claimHash` and `sig`, and checks whether the
-  ///   signature matches the expected key, and is signed by `issuer`
+  ///   signature matches the expected key, and is signed by `attester`
   /// @param subject Account the claim refers to
-  /// @param issuer Account that signed the claim
+  /// @param attester Account that signed the claim
   /// @param claimHash the claimHash that was signed along with the subject
   /// @param sig The given signature that must match (`subject`, `claimhash`)
   function setClaimWithSignature(
     address subject,
-    address issuer,
+    address attester,
     bytes32 claimHash,
     bytes calldata sig
   ) public {
     bytes32 signable = computeSignableKey(subject, claimHash);
 
-    require(verifyWithPrefix(signable, sig, issuer), "ClaimsRegistry: Claim signature does not match issuer");
+    require(verifyWithPrefix(signable, sig, attester), "ClaimsRegistry: Claim signature does not match attester");
 
-    bytes32 key = computeKey(issuer, sig);
+    bytes32 key = computeKey(attester, sig);
 
     registry[key] = Claim(subject, false);
 
@@ -64,14 +64,14 @@ contract ClaimsRegistry is IClaimsRegistryVerifier, Verifier {
   }
 
   /// @notice Checks if a claim signature is valid and stored, and returns the corresponding subject
-  /// @param issuer Account that signed the claim
+  /// @param attester Account that signed the claim
   /// @param sig The given signature that must match keccak256([`subject`, `claimhash`])
   /// @return The subject of the claim, or address(0) if none was found
   function getClaim(
-    address issuer,
+    address attester,
     bytes calldata sig
   ) public view returns (address) {
-    bytes32 key = keccak256(abi.encodePacked(issuer, sig));
+    bytes32 key = keccak256(abi.encodePacked(attester, sig));
 
     if (registry[key].revoked) {
       return address(0);
@@ -83,18 +83,18 @@ contract ClaimsRegistry is IClaimsRegistryVerifier, Verifier {
 
   /// @notice Checks if a claim signature is valid, and corresponds to the given subject
   /// @param subject Account the claim refers to
-  /// @param issuer Account that signed the claim
+  /// @param attester Account that signed the claim
   /// @param sig The given signature that must match keccak256([`subject`, `claimhash`])
   /// @return The subject of the claim, or address(0) if none was found
   function verifyClaim(
     address subject,
-    address issuer,
+    address attester,
     bytes calldata sig
   ) override external view returns (bool) {
-    return getClaim(issuer, sig) == subject;
+    return getClaim(attester, sig) == subject;
   }
 
-  /// @notice Callable by an issuer, to revoke previously signed claims about a subject
+  /// @notice Callable by an attester, to revoke previously signed claims about a subject
   /// @param sig The given signature that must match keccak256([`subject`, `claimhash`])
   function revokeClaim(
     bytes calldata sig
@@ -108,15 +108,15 @@ contract ClaimsRegistry is IClaimsRegistryVerifier, Verifier {
     emit ClaimRevoked(sig);
   }
 
-  /// @notice computes the hash that must be signed by the issuer before storing a claim
+  /// @notice computes the hash that must be signed by the attester before storing a claim
   /// @param subject Account the claim refers to
   /// @param claimHash the claimHash that was signed along with the subject
-  /// @return The hash to be signed by the issuer
+  /// @return The hash to be signed by the attester
   function computeSignableKey(address subject, bytes32 claimHash) public pure returns (bytes32) {
     return keccak256(abi.encodePacked(subject, claimHash));
   }
 
-  function computeKey(address issuer, bytes calldata sig) internal pure returns (bytes32) {
-    return keccak256(abi.encodePacked(issuer, sig));
+  function computeKey(address attester, bytes calldata sig) internal pure returns (bytes32) {
+    return keccak256(abi.encodePacked(attester, sig));
   }
 }

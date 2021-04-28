@@ -18,9 +18,9 @@ contract Staking is CappedRewardCalculator, Ownable {
   /// @notice claim registry where signatures are to be stored and verified
   IClaimsRegistryVerifier public registry;
 
-  /// @notice The expected issuer address against which claims will be verified
+  /// @notice The expected attester address against which claims will be verified
   ///   (i.e. they must be signed by this address)
-  address public claimIssuer;
+  address public claimattester;
 
   /// @notice The minimum staking amount per account
   uint public minAmount;
@@ -69,7 +69,7 @@ contract Staking is CappedRewardCalculator, Ownable {
   /// @notice Staking constructor
   /// @param _token ERC20 token address to use
   /// @param _registry ClaimsRegistry address to use
-  /// @param _issuer expected issuer of claims when verifying them
+  /// @param _attester expected attester of claims when verifying them
   /// @param _startDate timestamp starting at which stakes are allowed. Must be greater than instantiation timestamp
   /// @param _endDate timestamp at which staking is over (no more rewards are given, and new stakes are not allowed)
   /// @param _minAmount minimum staking amount for each account
@@ -78,7 +78,7 @@ contract Staking is CappedRewardCalculator, Ownable {
   constructor(
     address _token,
     address _registry,
-    address _issuer,
+    address _attester,
     uint _startDate,
     uint _endDate,
     uint _minAmount,
@@ -87,14 +87,14 @@ contract Staking is CappedRewardCalculator, Ownable {
   ) CappedRewardCalculator(_startDate, _endDate, _cap) {
     require(_token != address(0), "Staking: token address cannot be 0x0");
     require(_registry != address(0), "Staking: claims registry address cannot be 0x0");
-    require(_issuer != address(0), "Staking: claim issuer cannot be 0x0");
+    require(_attester != address(0), "Staking: claim attester cannot be 0x0");
     require(block.timestamp <= _startDate, "Staking: start date must be in the future");
     require(_minAmount > 0, "Staking: invalid individual min amount");
     require(_maxAmount > _minAmount, "Staking: max amount must be higher than min amount");
 
     erc20 = ERC20(_token);
     registry = IClaimsRegistryVerifier(_registry);
-    claimIssuer = _issuer;
+    claimattester = _attester;
 
     minAmount = _minAmount;
     maxAmount = _maxAmount;
@@ -115,14 +115,14 @@ contract Staking is CappedRewardCalculator, Ownable {
   /// @notice Requests a new stake to be created. Only one stake per account is
   ///   created, maximum rewards are calculated upfront, and a valid claim
   ///   signature needs to be provided, which will be checked against the expected
-  ///   issuer on the registry contract
+  ///   attester on the registry contract
   /// @param _amount Amount of tokens to stake
   /// @param claimSig Signature to check against the registry contract
   function stake(uint _amount, bytes calldata claimSig) external {
     uint time = block.timestamp;
     address subscriber = msg.sender;
 
-    require(registry.verifyClaim(msg.sender, claimIssuer, claimSig), "Staking: could not verify claim");
+    require(registry.verifyClaim(msg.sender, claimattester, claimSig), "Staking: could not verify claim");
     require(_amount >= minAmount, "Staking: staked amount needs to be greater than or equal to minimum amount");
     require(_amount <= maxAmount, "Staking: staked amount needs to be lower than or equal to maximum amount");
     require(time >= startDate, "Staking: staking period not started");

@@ -95,7 +95,7 @@ verify claims.
 
 Each claim has a few properties:
 * `subject`: Who the claim is about
-* `issuer`: Who issued and signed the claim
+* `attester`: Who issued and signed the claim
 * `claimHash`: A generic hash generatic by the browser. Allows verification of
     data without actually storing personal information
 * `signature`: The signature, which must correspond to `hash([subject, claimHash])`
@@ -104,11 +104,11 @@ The expected flow is as follows:
 * Plugin gathers all date and generates a root `claimHash`
 * Plugin calls `registry.computeSignableKey(subjectAddress, rootHash)`, and
     receives a new hash, `signableHash` as a result
-* Issuer's wallet signs `signableHash` and returns the signature to the plugin
-* Plugin calls `registry.setClaimWithSignature(subject, issuer, rootHash,
+* Attester's wallet signs `signableHash` and returns the signature to the plugin
+* Plugin calls `registry.setClaimWithSignature(subject, attester, rootHash,
     signature)`, which validates the signature against the subject, hash, and
-    issuer, and stores it
-* Further calls to `registry.getClaim(issuer, signature)` should return `subject`;
+    attester, and stores it
+* Further calls to `registry.getClaim(attester, signature)` should return `subject`;
 
 
 ### Staking
@@ -116,7 +116,7 @@ The expected flow is as follows:
 A staking contract receives the following arguments:
 * `_token`: Address of the ERC20 token to stake
 * `_registry`: Address of the `ClaimsRegistry` contract
-* `_issuer`: Address of the issuer to expect when verifying claims
+* `_attester`: Address of the attester to expect when verifying claims
 * `_startDate`: Timestamp at which staking becomes possible
 * `_endDate`: Timestamp at which staking is over
 * `_individualMinimumAmount`: Minimum amount (in token subunits) required for each subscription

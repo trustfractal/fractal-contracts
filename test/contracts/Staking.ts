@@ -21,7 +21,7 @@ let owner: any;
 let alice: any;
 let bob: any;
 let fcl: any;
-let issuer: any;
+let attester: any;
 let registry: any;
 const start = dayjs()
   .add(1, "day")
@@ -36,7 +36,7 @@ describe("Staking", () => {
     owner = signers[0];
     alice = signers[1];
     bob = signers[2];
-    issuer = signers[3];
+    attester = signers[3];
   });
 
   beforeEach(async () => {
@@ -54,7 +54,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         end,
         2,
@@ -78,7 +78,7 @@ describe("Staking", () => {
       const args = [
         zero,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         end,
         2,
@@ -98,7 +98,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         zero,
-        issuer.address,
+        attester.address,
         start,
         end,
         2,
@@ -113,7 +113,7 @@ describe("Staking", () => {
       );
     });
 
-    it("fails if issuer address is 0x0", async () => {
+    it("fails if attester address is 0x0", async () => {
       const zero = "0x0000000000000000000000000000000000000000";
       const args = [
         fcl.address,
@@ -129,7 +129,7 @@ describe("Staking", () => {
       const action = deploy(owner, StakingArtifact, args);
 
       await expect(action).to.be.revertedWith(
-        "Staking: claim issuer cannot be 0x0"
+        "Staking: claim attester cannot be 0x0"
       );
     });
 
@@ -140,7 +140,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         one_hour_before,
         2,
@@ -159,7 +159,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         end,
         0,
@@ -178,7 +178,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         end,
         2,
@@ -197,7 +197,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         end,
         2,
@@ -216,7 +216,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         end,
         2,
@@ -296,7 +296,7 @@ describe("Staking", () => {
       const args = [
         fcl.address,
         registry.address,
-        issuer.address,
+        attester.address,
         start,
         oneMonthLater,
         minSubscription,
@@ -434,7 +434,7 @@ describe("Staking", () => {
         staking = (await deploy(owner, StakingArtifact, [
           fcl.address,
           registry.address,
-          issuer.address,
+          attester.address,
           oneMonthLater,
           oneYearLater,
           minSubscription,
