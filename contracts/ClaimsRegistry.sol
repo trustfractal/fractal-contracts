@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.3;
 
-import "hardhat/console.sol";
-
 import "./ClaimsRegistry/Verifier.sol";
 
 /// @title The claim verification interface expected by the Staking contract

@@ -4,7 +4,6 @@ pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 
 import "./Staking/CappedRewardCalculator.sol";
 import "./ClaimsRegistry.sol";
@@ -164,10 +163,6 @@ contract Staking is CappedRewardCalculator, Ownable {
     uint actualReward = calculateReward(sub.startDate, time, sub.stakedAmount);
     uint total = sub.stakedAmount + actualReward;
 
-
-    // transfer tokens back to subscriber
-    require(erc20.transfer(subscriber, total), "Staking: Transfer has failed");
-
     // update subscription state
     sub.withdrawAmount = total;
     sub.withdrawDate = time;
@@ -178,6 +173,9 @@ contract Staking is CappedRewardCalculator, Ownable {
     lockedReward -= sub.maxReward;
     distributedReward += actualReward;
     stakedAmount -= sub.stakedAmount;
+
+    // transfer tokens back to subscriber
+    require(erc20.transfer(subscriber, total), "Staking: Transfer has failed");
 
     emit Withdrawn(subscriber, time, total);
   }

@@ -8,8 +8,6 @@ pragma solidity ^0.8.3;
 // integral:
 // https://www.wolframalpha.com/input/?i=integrate%5B-1%2B1.01*10%5E%282-0.02*x%29%2C+x%5D
 
-import "hardhat/console.sol";
-
 /// @title Calculates rewards based on an initial downward curve period, and a second constant period
 /// @author Miguel Palhas <miguel@subvisual.co>
 contract CappedRewardCalculator {

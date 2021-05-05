@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.3;
 
-import "hardhat/console.sol";
-
 contract Verifier {
   function verifyWithPrefix(bytes32 hash, bytes calldata sig, address signer) public pure returns (bool) {
     return verify(addPrefix(hash), sig, signer);
