@@ -4,15 +4,12 @@ import dayjs from "dayjs";
 const { parseEther } = ethers.utils;
 const { env, exit } = process;
 
-interface Contract {
-  address: string;
-}
-
 const config: Record<string, any> = {
   ropsten: {
     fcl: env.ROPSTEN_FCL,
     lp: env.ROPSTEN_FCL_ETH_LP,
     attester: env.ROPSTEN_FRACTAL_ATTESTER,
+    registry: env.ROPSTEN_CLAIMS_REGISTRY,
     start: dayjs("2021-04-25T12:00:00.000Z").unix(),
     end: dayjs("2021-04-25T12:00:00.000Z")
       .add(60, "days")
@@ -23,6 +20,7 @@ const config: Record<string, any> = {
   },
   ganache: {
     attester: env.GANACHE_FRACTAL_ATTESTER,
+    registry: env.GANACHE_CLAIMS_REGISTRY,
     start: dayjs()
       .add(5, "minutes")
       .unix(),
@@ -37,6 +35,7 @@ const config: Record<string, any> = {
     fcl: env.MAINNET_FCL,
     lp: env.MAINNET_FCL_ETH_LP,
     attester: process.env.MAINNET_FRACTAL_ATTESTER,
+    registry: process.env.MAINNET_CLAIMS_REGISTRY,
     start: dayjs("TODO").unix(),
     end: dayjs("TODO")
       .add(60, "days")
@@ -70,24 +69,13 @@ async function deployTestTokens() {
   return { fcl, lp };
 }
 
-async function deployRegistry(): Promise<any> {
-  const ClaimsRegistry = await ethers.getContractFactory("ClaimsRegistry");
-
-  console.log(`Deploying ClaimsRegistry`);
-  const registry = await ClaimsRegistry.deploy();
-  await registry.deployed();
-  console.log("Registry deployed to:", registry.address);
-
-  return registry;
-}
-
-async function deployStaking(registry: Contract, args: Record<string, string>) {
+async function deployStaking(args: Record<string, string>) {
   const Staking = await ethers.getContractFactory("Staking");
 
   console.log(`Deploying FCL Staking`);
   const fclStaking = await Staking.deploy(
     args.fcl,
-    registry.address,
+    args.registry,
     args.attester,
     args.start,
     args.end,
@@ -99,7 +87,7 @@ async function deployStaking(registry: Contract, args: Record<string, string>) {
   console.log(`Deploying FCL-ETH LP Staking`);
   const lpStaking = await Staking.deploy(
     args.lp,
-    registry.address,
+    args.registry,
     args.attester,
     args.start,
     args.end,
@@ -126,15 +114,13 @@ async function main() {
     args.lp = tokens.lp.address;
   }
 
-  const registry = await deployRegistry();
-  const { fclStaking, lpStaking } = await deployStaking(registry, args);
+  const { fclStaking, lpStaking } = await deployStaking(args);
 
   console.log(`
 | Contract           | Address                                    |
 | ------------------ | ------------------------------------------ |
 | FCL Token          | ${args.fcl} |
 | FCL-ETH LP Token   | ${args.lp} |
-| ClaimRegistry      | ${registry.address} |
 | FCL Staking        | ${fclStaking.address} |
 | FTL-ETH LP Staking | ${lpStaking.address} |
 `);
