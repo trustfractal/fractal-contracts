@@ -19,27 +19,8 @@ describe("Verifier", () => {
     verifier = (await deployContract(owner, VerifierArtifact, [])) as Verifier;
   });
 
-  describe("recover", () => {
-    it("returns the original signer of a message with an Ethereum prefix", async () => {
-      const attester = (await ethers.getSigners())[0];
-      const prefix = Buffer.from("\x19Ethereum Signed Message:\n");
-
-      const value = arrayify(keccak256(toUtf8Bytes("hello")));
-
-      const sig = await attester.signMessage(value);
-
-      const prefixedValue = keccak256(
-        Buffer.concat([prefix, toUtf8Bytes(String(value.length)), value])
-      );
-
-      const result = await verifier.recover(prefixedValue, sig);
-
-      expect(result).to.equal(attester.address);
-    });
-  });
-
   describe("recoverWithPrefix", () => {
-    it("automatically includes the Ethereum prefix to validate the signature", async () => {
+    it("returns the original signer of a message with an Ethereum prefix", async () => {
       const attester = (await ethers.getSigners())[0];
       const value = arrayify(keccak256(toUtf8Bytes("hello")));
       const sig = await attester.signMessage(value);
@@ -50,31 +31,8 @@ describe("Verifier", () => {
     });
   });
 
-  describe("verify", () => {
-    it("returns the address of the signer", async () => {
-      const attester = (await ethers.getSigners())[0];
-      const prefix = Buffer.from("\x19Ethereum Signed Message:\n");
-
-      const value = arrayify(keccak256(toUtf8Bytes("hello")));
-
-      const sig = await attester.signMessage(value);
-
-      const prefixedValue = keccak256(
-        Buffer.concat([prefix, toUtf8Bytes(String(value.length)), value])
-      );
-
-      const result = await verifier.verify(
-        prefixedValue,
-        sig,
-        attester.address
-      );
-
-      expect(result).to.equal(true);
-    });
-  });
-
   describe("verifyWithPrefix", () => {
-    it("automatically includes the Ethereum prefix to validate the signature", async () => {
+    it("returns the address of the signer", async () => {
       const attester = (await ethers.getSigners())[0];
       const value = arrayify(keccak256(toUtf8Bytes("hello")));
       const sig = await attester.signMessage(value);

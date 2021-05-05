@@ -6,7 +6,9 @@ pragma solidity ^0.8.3;
 /// @author Miguel Palhas <miguel@subvisual.co>
 contract Verifier {
 
-  /// @notice Verifies that the given signature matches the provided data, and was signed by the provided issuer. Assumes data was signed using the Ethereum prefix to protect against unkonwingly signing transactions
+  /// @notice Verifies that the given signature matches the provided data, and
+  ///   was signed by the provided issuer. Assumes data was signed using the
+  ///   Ethereum prefix to protect against unkonwingly signing transactions
   /// @param hash The data to verify
   /// @param sig The signature of the data
   /// @param signer The expected signer of the data
@@ -15,7 +17,9 @@ contract Verifier {
     return verify(addPrefix(hash), sig, signer);
   }
 
-  /// @notice Recovers the signer of the given signature and data. Assumes data was signed using the Ethereum prefix to protect against unknowingly signing transaction.s
+  /// @notice Recovers the signer of the given signature and data. Assumes data
+  ///  was signed using the Ethereum prefix to protect against unknowingly signing
+  ///  transaction.s
   /// @param hash The data to verify
   /// @param sig The signature of the data
   /// @return The address recovered by checking the signature against the data
@@ -23,11 +27,11 @@ contract Verifier {
     return recover(addPrefix(hash), sig);
   }
 
-  function verify(bytes32 hash, bytes calldata sig, address signer) public pure returns (bool) {
+  function verify(bytes32 hash, bytes calldata sig, address signer) internal pure returns (bool) {
     return recover(hash, sig) == signer;
   }
 
-  function recover(bytes32 hash, bytes calldata _sig) public pure returns (address) {
+  function recover(bytes32 hash, bytes calldata _sig) internal pure returns (address) {
     bytes memory sig = _sig;
     bytes32 r;
     bytes32 s;
