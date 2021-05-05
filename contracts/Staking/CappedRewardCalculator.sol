@@ -24,11 +24,11 @@ pragma solidity ^0.8.3;
 /// @author Miguel Palhas <miguel@subvisual.co>
 contract CappedRewardCalculator {
   /// @notice start of the staking period
-  uint public startDate;
+  uint public immutable startDate;
   /// @notice end of the staking period
-  uint public endDate;
+  uint public immutable endDate;
   /// @notice Reward cap for curve period
-  uint public cap;
+  uint public immutable cap;
 
   uint constant private year = 365 days;
   uint constant private day = 1 days;

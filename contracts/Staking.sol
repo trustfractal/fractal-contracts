@@ -12,20 +12,20 @@ import "./ClaimsRegistry.sol";
 /// @author Miguel Palhas <miguel@subvisual.co>
 contract Staking is CappedRewardCalculator, Ownable {
   /// @notice the token to stake
-  ERC20 public erc20;
+  ERC20 public immutable erc20;
 
   /// @notice claim registry where signatures are to be stored and verified
-  IClaimsRegistryVerifier public registry;
+  IClaimsRegistryVerifier public immutable registry;
 
   /// @notice The expected attester address against which claims will be verified
   ///   (i.e. they must be signed by this address)
-  address public claimattester;
+  address public immutable claimAttester;
 
   /// @notice The minimum staking amount per account
-  uint public minAmount;
+  uint public immutable minAmount;
 
   /// @notice The maximum staking amount per account
-  uint public maxAmount;
+  uint public immutable maxAmount;
 
   /// @notice Locked rewards pending withdrawal
   uint public lockedReward = 0;
@@ -93,7 +93,7 @@ contract Staking is CappedRewardCalculator, Ownable {
 
     erc20 = ERC20(_token);
     registry = IClaimsRegistryVerifier(_registry);
-    claimattester = _attester;
+    claimAttester = _attester;
 
     minAmount = _minAmount;
     maxAmount = _maxAmount;
@@ -121,7 +121,7 @@ contract Staking is CappedRewardCalculator, Ownable {
     uint time = block.timestamp;
     address subscriber = msg.sender;
 
-    require(registry.verifyClaim(msg.sender, claimattester, claimSig), "Staking: could not verify claim");
+    require(registry.verifyClaim(msg.sender, claimAttester, claimSig), "Staking: could not verify claim");
     require(_amount >= minAmount, "Staking: staked amount needs to be greater than or equal to minimum amount");
     require(_amount <= maxAmount, "Staking: staked amount needs to be lower than or equal to maximum amount");
     require(time >= startDate, "Staking: staking period not started");
