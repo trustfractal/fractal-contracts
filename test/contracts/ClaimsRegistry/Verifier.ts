@@ -63,7 +63,11 @@ describe("Verifier", () => {
         Buffer.concat([prefix, toUtf8Bytes(String(value.length)), value])
       );
 
-      const result = await verifier.verify(prefixedValue, sig, attester.address);
+      const result = await verifier.verify(
+        prefixedValue,
+        sig,
+        attester.address
+      );
 
       expect(result).to.equal(true);
     });
