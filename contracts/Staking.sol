@@ -134,10 +134,6 @@ contract Staking is CappedRewardCalculator, Ownable {
     lockedReward += maxReward;
     stakedAmount += _amount;
 
-    // transfer tokens from subscriber to the contract
-    require(erc20.transferFrom(subscriber, address(this), _amount),
-      "Staking: Could not transfer tokens from subscriber");
-
     subscriptions[subscriber] = Subscription(
       true,
       subscriber,
@@ -147,6 +143,10 @@ contract Staking is CappedRewardCalculator, Ownable {
       0,
       0
     );
+
+    // transfer tokens from subscriber to the contract
+    require(erc20.transferFrom(subscriber, address(this), _amount),
+      "Staking: Could not transfer tokens from subscriber");
 
     emit Subscribed(subscriber, time, _amount, maxReward);
   }
