@@ -308,81 +308,66 @@ describe("CappedRewardCalculator", () => {
     });
 
     describe("currentAPY", () => {
-      it("is around 700% at the beginning", async () => {
-        ensureTimestamp(start);
-        network.provider.send("evm_mine", []);
-        const apy0 = await calc.currentAPY();
+      it("is around 700% before the beginning", async () => {
+        const halfDayLater = dayjs
+          .unix(start)
+          .add(-12, "hours")
+          .unix();
 
-        ensureTimestamp(
-          dayjs
-            .unix(start)
-            .add(1, "days")
-            .unix()
-        );
+        ensureTimestamp(halfDayLater);
         network.provider.send("evm_mine", []);
-        const apy1 = await calc.currentAPY();
 
-        ensureTimestamp(
-          dayjs
-            .unix(start)
-            .add(10, "days")
-            .unix()
-        );
-        network.provider.send("evm_mine", []);
-        const apy10 = await calc.currentAPY();
+        const apy = await calc.currentAPY();
 
-        ensureTimestamp(
-          dayjs
-            .unix(start)
-            .add(60, "days")
-            .unix()
-        );
+        expect(apy).to.eq(717);
+      });
+
+      it("is 0% after the end", async () => {
+        const halfDayAfterClose = dayjs
+          .unix(twoMonthsLater)
+          .add(12, "hours")
+          .unix();
+
+        ensureTimestamp(halfDayAfterClose);
         network.provider.send("evm_mine", []);
-        const apy60 = await calc.currentAPY();
+
+        const apy = await calc.currentAPY();
+
+        expect(apy).to.eq(0);
+      });
+
+      it("matches the pre-calculated expected values", async () => {
+        const apyAfter = async (days: number, type: any) => {
+          ensureTimestamp(
+            dayjs
+              .unix(start)
+              .add(days, type)
+              .unix()
+          );
+          network.provider.send("evm_mine", []);
+          return calc.currentAPY();
+        };
+
+        const apy0 = await apyAfter(0, "days");
+        const apy1h = await apyAfter(1, "hour");
+        const apy12h = await apyAfter(12, "hour");
+        const apy1d = await apyAfter(1, "days");
+        const apy10d = await apyAfter(10, "days");
+        const apy50d = await apyAfter(50, "days");
+        const apy51d = await apyAfter(51, "days");
+        const apy55d = await apyAfter(55, "days");
+        const apy60d = await apyAfter(60, "days");
 
         expect(apy0).to.eq(717);
-        expect(apy1).to.eq(693);
-        expect(apy10).to.eq(496);
-        expect(apy60).to.eq(0);
+        expect(apy1h).to.eq(716);
+        expect(apy12h).to.eq(705);
+        expect(apy1d).to.eq(693);
+        expect(apy10d).to.eq(496);
+        expect(apy50d).to.eq(18);
+        expect(apy51d).to.eq(14);
+        expect(apy55d).to.eq(4);
+        expect(apy60d).to.eq(0);
       });
     });
   });
-
-  // describe("calculations", () => {
-  //   let twoMonthsLater = dayjs.unix(start).add(15, "days").unix();
-  //   let threeMonthsLater = dayjs
-  //     .unix(start)
-  //     .add(30 * 3, "months")
-  //     .unix();
-  //   let amount = parseEther("1000");
-
-  //   before(async () => {
-  //     const args = [start, twoMonthsLater, threeMonthsLater, 100, 15];
-
-  //     calc = (await deploy(
-  //       owner,
-  //       CappedRewardCalculatorArtifact,
-  //       args
-  //     )) as CappedRewardCalculator;
-
-  //     tester = (await deploy(
-  //       owner,
-  //       TestCappedRewardCalculatorArtifact,
-  //       args
-  //     )) as TestCappedRewardCalculator;
-  //   });
-
-  //   it.only("enter at 0%, cumulative earnings", async () => {
-  //     for (let enter = 0; enter <= 15; enter += 1) {
-  //       for (let exit = enter + 1; exit <= 15; exit += 1) {
-  //         const enter_t = dayjs.unix(start).add(enter, "days").unix();
-  //         const exit_t = dayjs.unix(start).add(exit, "days").unix();
-
-  //         const reward = await calc.calculateReward(enter_t, exit_t, amount);
-
-  //         console.log(`${enter}, ${exit}, ${formatUnits(reward)}`);
-  //       }
-  //     }
-  //   });
-  // });
 });

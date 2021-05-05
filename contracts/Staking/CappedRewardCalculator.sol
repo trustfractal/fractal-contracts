@@ -80,16 +80,18 @@ contract CappedRewardCalculator {
   /// @return The estimated APY (40 == 40%)
   function currentAPY() public view returns (uint) {
     uint amount = 100 ether;
-    uint current = block.timestamp + day;
-    uint currentReward = calculateReward(startDate, current, amount);
+    uint today = block.timestamp;
 
-    uint previous = current - day;
-    uint previousReward = 0;
-    if (previous > startDate) {
-      previousReward = calculateReward(startDate, previous, amount);
+    if (today < startDate) {
+      today = startDate;
     }
 
-    uint delta = currentReward - previousReward;
+    uint todayReward = calculateReward(startDate, today, amount);
+
+    uint tomorrow = today + day;
+    uint tomorrowReward = calculateReward(startDate, tomorrow, amount);
+
+    uint delta = tomorrowReward - todayReward;
     uint apy = delta * 365 * 100 / amount;
 
     return apy;
