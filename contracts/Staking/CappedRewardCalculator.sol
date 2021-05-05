@@ -2,13 +2,25 @@
 
 pragma solidity ^0.8.3;
 
-// curve definition:
-// https://www.desmos.com/calculator/8xyyuznuz3
-//
-// integral:
-// https://www.wolframalpha.com/input/?i=integrate%5B-1%2B1.01*10%5E%282-0.02*x%29%2C+x%5D
-
 /// @title Calculates rewards based on an initial downward curve period, and a second constant period
+/// @notice Calculation of the reward is based on a few rules:
+///   * start and end date of the staking period (the earlier you enter, and
+///     the longer you stay, the greater your overall reward)
+///
+///   * At each point, the the current reward is described by a downward curve
+///     (https://www.desmos.com/calculator/dz8vk1urep)
+///
+///   * Computing your total reward (which is done upfront in order to lock and
+///     guarantee your reward) means computing the integral of the curve period from
+///     your enter date until the end
+///     (https://www.wolframalpha.com/input/?i=integrate+%28100-x%29%5E2)
+///
+///   * This integral is the one being calculated in the `integralAtPoint` function
+///
+///   * Besides this rule, rewards are also capped by a maximum percentage
+///     provided at contract instantiation time (a cap of 40 means your maximum
+///     possible reward is 40% of your initial stake
+///
 /// @author Miguel Palhas <miguel@subvisual.co>
 contract CappedRewardCalculator {
   /// @notice start of the staking period
