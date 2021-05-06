@@ -34,7 +34,7 @@ and use it with [direnv](https://direnv.net/).
 | ------------------ | ------------------------------------------ |
 | FCL Token          | 0xf4d861575ecc9493420a3f5a14f85b13f0b50eb3 |
 | FCL-ETH LP Token   | 0xdec87f2f3e7a936b08ebd7b2371ab12cc8b68340 |
-| ClaimRegistry      | TODO                                       |
+| ClaimRegistry      | 0x1A5FA65E50d503a29Ec57cD102f2e7970a6963BB |
 | FCL Staking        | TODO                                       |
 | FTL-ETH LP Staking | TODO                                       |
 
