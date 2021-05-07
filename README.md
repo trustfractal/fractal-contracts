@@ -18,7 +18,7 @@ and use it with [direnv](https://direnv.net/).
 
 ## Deployed addresses
 
-### Ropsten
+### Ropsten (test v1)
 
 | Contract           | Address                                    |
 | ------------------ | ------------------------------------------ |
@@ -27,6 +27,16 @@ and use it with [direnv](https://direnv.net/).
 | ClaimRegistry      | 0x181573a13F4BF5F76F6d09D0E2a7716F6929993A |
 | FCL Staking        | 0x6b21231526C87EB88A8ECea9f351895AA85dcB84 |
 | FTL-ETH LP Staking | 0x596644D95282Ce22fE92772DfbBaa60Ecd0018e9 |
+
+### Ropsten (test v2)
+
+| Contract           | Address                                    |
+| ------------------ | ------------------------------------------ |
+| FCL Token          | 0xf0Ec4dCD7D375023f2B8E9db19aC5DB95b06a06A |
+| FCL-ETH LP Token   | 0x93c45B9a9151e8c4C88e9a4990853Fa2b500C07c |
+| ClaimRegistry      | 0x3FDC8245C0D167Ff3d8369615975cA2D8b391732 |
+| FCL Staking        | 0xb6F33aA4896239e63B1a0d58baA0bE748113b414 |
+| FTL-ETH LP Staking | 0xCD6D1697c08dD717420BE2D987Eb80d85c962FFa |
 
 ### Mainnet
 

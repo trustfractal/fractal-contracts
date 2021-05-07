@@ -9,9 +9,9 @@ const config: Record<string, any> = {
     fcl: env.ROPSTEN_FCL,
     lp: env.ROPSTEN_FCL_ETH_LP,
     attester: env.ROPSTEN_FRACTAL_ATTESTER,
-    registry: env.ROPSTEN_CLAIMS_REGISTRY,
-    start: dayjs("2021-04-25T12:00:00.000Z").unix(),
-    end: dayjs("2021-04-25T12:00:00.000Z")
+    registry: env.ROPSTEN_CLAIMS_REGISTRY_V2,
+    start: dayjs("2021-05-07T13:00:00.000Z").unix(),
+    end: dayjs("2021-05-07T13:00:00.000Z")
       .add(60, "days")
       .unix(),
     minStake: parseEther("1"),
