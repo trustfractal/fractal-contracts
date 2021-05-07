@@ -145,3 +145,17 @@ The expected flow is as follows:
 * Plugin can query the contract to get the current pool availability, size of
     a particular stake, current reward, start/end dates, and calculate a reward
     for arbitrary numbers before issuing a stake
+
+## License
+
+`fractal-contracts` is copyright &copy; 2021 Trust Fractal GmbH.
+
+It is open-source, made available for free, and is subject to the terms in its [license].
+
+## About
+
+`fractal-contracts` was created and is maintained with :heart: by [Fractal Protocol][fractal].
+
+[license]: ./LICENSE
+[fractal]: https://protocol.fractal.id/
+
