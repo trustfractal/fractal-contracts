@@ -41,8 +41,8 @@ const config: HardhatUserConfig = {
     runOnCompile: true,
   },
   gasReporter: {
-    currency: "EUR",
-    gasPrice: 62,
+    currency: "ETH",
+    gasPrice: 135,
     coinmarketcap: CMC_API_KEY,
   },
   networks: {
