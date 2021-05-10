@@ -2,6 +2,7 @@ import "@typechain/hardhat";
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-web3";
+import "@nomiclabs/hardhat-etherscan";
 import "hardhat-gas-reporter";
 import "hardhat-docgen";
 
@@ -13,6 +14,7 @@ const {
   MAINNET_MNEMONIC,
   GANACHE_MNEMONIC,
   CMC_API_KEY,
+  ETHERSCAN_API_KEY,
 } = process.env;
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -44,6 +46,9 @@ const config: HardhatUserConfig = {
     currency: "ETH",
     gasPrice: 135,
     coinmarketcap: CMC_API_KEY,
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY,
   },
   networks: {
     ropsten: {
