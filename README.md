@@ -1,5 +1,14 @@
 # Fractal Staking/DID contracts
 
+Contracts for Claims Registry and Token staking for the Fractal Wallet
+& Protocol.
+
+## Audit
+
+All 3 contracts were audited by [Least Authority](https://leastauthority.com/).
+The final audit report is publicly available
+[here](./least-authority-audit.pdf).
+
 ## Development (with ganache)
 
 ### Secrets
