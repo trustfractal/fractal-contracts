@@ -10,9 +10,9 @@ const config: Record<string, any> = {
       token: env.ROPSTEN_FCL,
       attester: env.ROPSTEN_FRACTAL_ATTESTER,
       registry: env.ROPSTEN_CLAIMS_REGISTRY_V2,
-      start: dayjs("2021-05-07T13:00:00.000Z").unix(),
-      end: dayjs("2021-05-07T13:00:00.000Z")
-        .add(60, "days")
+      start: dayjs("2021-05-24T21:00:00.000Z").unix(),
+      end: dayjs("2021-05-24T21:00:00.000Z")
+        .add(17, "hours")
         .unix(),
       minStake: parseEther("1"),
       maxStake: parseEther("10000"),
@@ -22,9 +22,9 @@ const config: Record<string, any> = {
       token: env.ROPSTEN_FCL_ETH_LP,
       attester: env.ROPSTEN_FRACTAL_ATTESTER,
       registry: env.ROPSTEN_CLAIMS_REGISTRY_V2,
-      start: dayjs("2021-05-07T13:00:00.000Z").unix(),
-      end: dayjs("2021-05-07T13:00:00.000Z")
-        .add(60, "days")
+      start: dayjs("2021-05-24T21:00:00.000Z").unix(),
+      end: dayjs("2021-05-24T21:00:00.000Z")
+        .add(18, "hours")
         .unix(),
       minStake: parseEther("1"),
       maxStake: parseEther("10000"),
