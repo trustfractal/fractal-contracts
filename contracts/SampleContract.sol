@@ -12,7 +12,54 @@ contract SampleContract {
 // countryOfIDIssuance - 1 byte
 // rootHash - 32 bytes
 // credentialSignature - 65 bytes
-  address constant public FRACTAL_SIGNER = 0xEdfFF6e8617586572e69566346bf7f1afbb3569d;
+  address constant public FRACTAL_SIGNER = 0x7972fd0456E94F2140e7AC274E2499039Fdf8741;
+
+  mapping(address => uint256) amounts;
+  mapping(address => KYC) kycs;
+
+  struct KYC {
+    uint8 kycType;
+    uint8 countryOfResidence;
+    uint8 countryOfIDIssuance;
+    bytes32 rootHash;
+    bytes sig;
+  }
+
+  function transferAndVerify(address _to, uint256 amount,
+    address sender,
+    uint8 kycType,
+    uint8 countryOfResidence,
+    uint8 countryOfIDIssuance,
+    bytes32 rootHash,
+    bytes calldata sig
+  ) external {
+    // erc20.transferFrom(...)
+    bytes32 signable = computeKey(sender, kycType, countryOfResidence, countryOfIDIssuance, rootHash);
+
+    KYC storage kyc = kycs[sender];
+
+    if (kyc.kycType == 0) {
+      require(verifyWithPrefix(signable, sig, FRACTAL_SIGNER), "invalid sig");
+      kyc.kycType = kycType;
+      kyc.countryOfResidence= countryOfResidence;
+      kyc.countryOfIDIssuance=countryOfIDIssuance;
+      // kyc.rootHash=rootHash;
+      // kyc.sig=sig;
+    }
+
+    amounts[sender] += amount;
+  }
+
+  function transfer(address sender, address _to, uint256 amount) external {
+    // erc20.transferFrom(...)
+    KYC storage kyc = kycs[sender];
+
+    if (kyc.kycType == 0) {
+      require(false, "not verified");
+    }
+
+    amounts[sender] += amount;
+  }
 
   function verify(
     address sender,
@@ -34,14 +81,15 @@ contract SampleContract {
     uint8 countryOfIDIssuance,
     bytes32 rootHash
   ) public pure returns (bytes32) {
+    // return keccak256(abi.encodePacked(sender));
     return keccak256(abi.encodePacked(sender, kycType, countryOfResidence, countryOfIDIssuance, rootHash));
   }
 
   function verifyWithPrefix(bytes32 hash, bytes calldata sig, address signer) internal pure returns (bool) {
-    return verify(addPrefix(hash), sig, signer);
+    return _verify(addPrefix(hash), sig, signer);
   }
 
-  function verify(bytes32 hash, bytes calldata sig, address signer) internal pure returns (bool) {
+  function _verify(bytes32 hash, bytes calldata sig, address signer) internal pure returns (bool) {
     return recover(hash, sig) == signer;
   }
 
