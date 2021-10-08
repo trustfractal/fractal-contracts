@@ -1,7 +1,7 @@
 import "@typechain/hardhat";
-import { task } from "hardhat/config";
+import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
-import "@nomiclabs/hardhat-web3";
+import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "hardhat-gas-reporter";
 import "hardhat-docgen";
